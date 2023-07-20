@@ -1,0 +1,32 @@
+----installing mysql------
+
+1. sudo apt install mysql-server
+2. sudo systemctl start mysql.service
+
+3. sudo mysql
+
+4. ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+
+5. exit
+
+6. mysql -u root -p 
+password
+
+now password is 2000
+
+
+7. ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+
+8. sudo mysql_secure_installation
+
+CREATE USER 'saksham'@'localhost' IDENTIFIED BY 'password';
+
+9. user--> saksham password --> password 
+
+10. GRANT PRIVILEGE ON database.table TO 'username'@'host';
+
+
+---testing mysql ------
+
+11 . systemctl status mysql.service
+12. sudo mysqladmin -p -u saksham version

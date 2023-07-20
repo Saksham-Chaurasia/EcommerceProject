@@ -1,5 +1,13 @@
 ----installing sqoop-----
 
-1. wget https://downloads.apache.org/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-3.2.0.tar.gz
-2. tar -xzvf sqoop-1.4.7.bin__hadoop-3.2.0.tar.gz
-3. 
+1. wget https://archive.apache.org/dist/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+2. tar -xvzf sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+3. sudo nano ~\.bashrc
+
+setting export sqoop home
+
+export SQOOP_HOME=/home/hadoop/sqoop
+
+export PATH=$PATH:$SQOOP_HOME/bin
+
+

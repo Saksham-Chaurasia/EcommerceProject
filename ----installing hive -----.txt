@@ -1,0 +1,36 @@
+----installing hive -----
+
+1. wget https://downloads.apache.org/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+2. tar xzf apache-hive-3.1.2-bin.tar.gz
+3. sudo nano ~/.bashrc
+
+4. setting hive home
+
+export HIVE_HOME=/home/hadoop/hive
+export PATH=$PATH:$HIVE_HOME/bin
+
+5. sudo nano $HIVE_HOME/bin/hive-config.sh
+
+6. add the hadoop path there 
+export HADOOP_HOME=/home/hadoop/hadoop
+
+----start the servers first----
+
+7. hdfs dfs -mkdir /tmp
+8. hdfs dfs -chmod g+w /tmp
+9. hdfs dfs -ls /
+
+10. hdfs dfs -mkdir -p /user/hive/warehouse
+11. hdfs dfs -chmod g+w /user/hive/warehouse
+12. hdfs dfs -ls /user/hive
+
+
+ ---initiating derby database ----
+
+13. $HIVE_HOME/bin/schematool -dbType derby -initSchema
+
+----launching hive---
+14. cd $HIVE_HOME/bin 
+
+15. hive
+

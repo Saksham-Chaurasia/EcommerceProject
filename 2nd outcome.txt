@@ -1,5 +1,5 @@
 ---------Local-->HDFS-->mysql-->hive---------------
----------1st outcome --------------------- Data migration---------
+---------2nd outcome --------------------- Data migration---------
 -------hive processing ---------------------
 
 1. Copy from local to hdfs
