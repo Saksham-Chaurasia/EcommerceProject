@@ -1,0 +1,36 @@
+3rd outcome
+
+------Bucketing and partitioning for fast hive queries-------
+
+------creating hive external tables for that----
+
+* create external table pur(userid string, `timestamp` timestamp, amount float) clustered by (`timestamp`) into 10 buckets row format delimited fields terminated by ',' stored as textfile location '/companyProject/purchaseData';
+
+* create external table cus(userid string, name string, email string) row format delimited fields terminated by ',' stored as textfile location '/companyProject/customerData';
+
+* create external table click(userid string, `timestamp` timestamp) partitioned by (page string) clustered by (userid) into 10 buckets row format delimited fields terminated by ',' stored as textfile location '/companyProject/clickstreamData';
+
+Note: i've picked the userid in clickstream as a bucket we want to see the user behaviour..and also it is repeating. so most effective is to pick userid.
+
+-------------------------
+
+
+------setting dynamic partitioning and bucketing ------
+
+
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.enforce.bucketing=true;
+
+
+-------------------------------
+
+------loading external table from the formatted table------
+
+* insert into table pur select userid, `timestamp`, amount from purchase;
+
+* insert into table cus select userid, name, email from customer;
+
+* insert into table click partition(page) select userid, `timestamp`, page from clickstream;
+
+------------------

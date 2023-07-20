@@ -1,0 +1,100 @@
+Installing hadoop in ubuntu:--
+
+1. sudo adduser hadoop (password: 2000) (full name: hadoop)
+2. sudo apt update
+3. sudo apt install openjdk-8-jdk -y
+4. java -version
+5. sudo apt install openssh-server openssh-client -y
+6. sudo su - hadoop 
+7. ssh-keygen -t rsa
+8. sudo cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+9. sudo chmod 640 ~/.ssh/authorized_keys
+10. ssh localhost
+11. wget https://downloads.apache.org/hadoop/common/hadoop-3.3.2/hadoop-3.3.2.tar.gz
+12. tar -xvzf hadoop-3.3.2.tar.gz
+13. mv hadoop-3.3.2 hadoop
+14. which java 
+15. dirname $(dirname $(readlink -f $(which java)))
+16. cd hadoop/etc/hadoop
+ 
+ bashrc, hadoop-env.sh, core-site.xml, hdfs-site.xml, mapred-site-xml and yarn-site.xml
+17. ls
+18. sudo visudo
+19. hadoop ALL=(ALL:ALL) ALL
+then save the file
+
+20. sudo nano ~/.bashrc
+----------------- add these lines ------------------
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HADOOP_HOME=/usr/local/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
+
+21. source ~/.bashrc
+22. sudo nano hadoop-env.sh
+
+uncomment java home
+
+23. which javac
+24. readlink -f /usr/bin/javac
+25. sudo nano core-site.xml
+
+------ add these lines ---------------
+
+<configuration>
+ <property>
+                 <name>fs.defaultFS</name>
+                 <value>hdfs://localhost:9000</value>
+         </property>
+ </configuration>
+
+
+26. sudo nano hdfs-site.xml
+
+------- add these lines ---------
+
+<configuration>
+        <property>
+                <name>dfs.replication</name>
+                <value>1</value>
+        </property>
+        <property>
+                <name>dfs.name.dir</name>
+                <value>file:///home/hadoop/hadoopdata/hdfs/namenode</value>
+        </property>
+        <property>
+                <name>dfs.data.dir</name>
+                <value>file:///home/hadoop/hadoopdata/hdfs/datanode</value>
+        </property>
+</configuration>
+
+27. sudo nano mapred-site.xml
+
+------- add these lines ----------
+
+<configuration> 
+<property> 
+  <name>mapreduce.framework.name</name> 
+  <value>yarn</value> 
+</property> 
+</configuration>
+
+
+28. sudo nano yarn-site.xml
+----- add these lines --------
+
+<configuration>
+        <property>
+                <name>yarn.nodemanager.aux-services</name>
+                <value>mapreduce_shuffle</value>
+        </property>
+</configuration>
+
+29. hdfs namenode -format

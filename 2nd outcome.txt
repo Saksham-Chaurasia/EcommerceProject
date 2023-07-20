@@ -1,0 +1,115 @@
+---------Local-->HDFS-->mysql-->hive---------------
+---------1st outcome --------------------- Data migration---------
+-------hive processing ---------------------
+
+1. Copy from local to hdfs
+
+* hadoop fs -put companyProject   --> it will directly make a comapny to hdfs location 'hadoop fs -ls'
+
+* hadoop fs -ls
+
+validating--
+
+* hadoop fs -cat companyProject/purchase_data.csv 
+
+* mysql -utraining -ptraining   or mysql --user=training --password=training  (in a new terminal)
+
+* create database commerce2;
+
+* use commerce2;
+
+------ creating table in mysql------
+
+
+* create table purchase(userID varchar(20) not null primary key, timestamp varchar(20), amount varchar(30)); --> dataset purchase
+
+* create table customer(userID varchar(20) not null primary key, name varchar(30), email varchar(30));  --> dataset customer
+
+* create table clickstream(userID varchar(20), timestamp varchar(20), page varchar(30)); --> dataset clickstream
+
+----- create staging table in mysql----
+
+* create table stage_purchase(userID varchar(20) not null primary key, timestamp varchar(20), amount varchar(30)); --> dataset purchase
+
+* create table stage_customer(userID varchar(20) not null primary key, name varchar(30), email varchar(30));  --> dataset customer
+
+* create table stage_clickstream(userID varchar(20), timestamp varchar(20), page varchar(30)); --> dataset clickstream
+
+-------------------------------------------
+
+--------------Assuming the inconsistent data is already in mysql then only preprocessing to load the data in hive is possible--------------
+
+
+------ sqoop export command for all datasets ------
+
+* sqoop export --connect jdbc:mysql://localhost/commerce2 --username training --password training --table stage_purchase --export-dir companyProject/purchase_data.csv -m4
+
+* sqoop export --connect jdbc:mysql://localhost/commerce --username training --password training --table stage_customer --export-dir companyProject/customer_data.csv -m4
+
+* sqoop export --connect jdbc:mysql://localhost/commerce --username training --password training --table stage_clickstream --export-dir companyProject/clickstream_data.csv -m4
+
+
+-------------sqoop eval command to remove the first row ------ (because originally our mysql data should not going to have header row directly in it just assuming)-------
+
+* sqoop eval --connect jdbc:mysql://localhost/commerce2 --username training --password training --query "insert into purchase select * from stage_purchase where userID !='\"userID';"
+
+
+* sqoop eval --connect jdbc:mysql://localhost/commerce2 --username training --password training --query "insert into customer select * from stage_customer where userID !='\"userID';"
+
+
+* sqoop eval --connect jdbc:mysql://localhost/commerce2 --username training --password training --query "insert into clickstream select * from stage_clickstream where userID !='\"userID';"
+
+error: beware of slash character before \"userID Okay!!
+
+------ now our inconsistent data in mysql is created------
+
+------mysql to hive------------using sqoop import -----------
+
+* create database commerce;
+* use commerce;
+* set hive.cli.print.current.db=true;
+
+
+------ importing to hive temporary tables -------- 
+---- after that i will use udf to remove double quotes --------
+------- into a new table --------
+
+
+* sqoop import --connect jdbc:mysql://localhost/commerce2 --username training --password training --table purchase --hive-table commerce2.stage_purchase --create-hive-table --hive-import -m1
+
+* sqoop import --connect jdbc:mysql://localhost/commerce2 --username training --password training --table customer  --hive-table commerce2.stage_customer --create-hive-table --hive-import -m1
+
+* sqoop import --connect jdbc:mysql://localhost/commerce2 --username training --password training --table clickstream --hive-table commerce2.stage_clickstream --create-hive-table --hive-import -m1
+
+---------------
+
+------creating hive tables --------
+
+* create table purchase(userID string, `timestamp` timestamp, amount float) row format delimited fields terminated by ',' stored as textfile;
+
+* create table customer(userID string, name string, email string) row format delimited fields terminated by ',' stored as textfile;
+
+* create table clickstream(userID string, `timestamp` timestamp, page string) row format delimited fields terminated by ',' stored as textfile;
+
+
+--------udf jar file adding and creating temporary function for that ----------
+
+* add jar /home/training/companyProject/ecommerce.jar;
+
+* hive> create temporary function quotes as 'com.ecommerceudf.doublequotes';
+
+
+--------- inserting into other table with udf function -------------------
+
+* insert into table purchase select quotes(userid), `timestamp`,quotes(amount) from stage_purchase;
+
+* insert into table customer select quotes(userid), name, quotes(email) from stage_customer;
+
+* insert into table clickstream select quotes (userid), `timestamp`, quotes(page) from stage_clickstream;
+
+--------------------------------------------------
+
+
+
+
+

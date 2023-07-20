@@ -1,0 +1,59 @@
+4th outcome
+
+---- hiveQl queries---
+
+Q1. Counting number of customers from customerdata?
+
+* select count(distinct userid) from cus;
+
+Q2. Total income from purchase data?
+
+* select sum(amount) from pur;
+
+Q3. For each customer number of purchases and name from customer;
+
+* select  c.name as name, count(p.userid) as count  from cus c join pur p on (p.userid = c.userid) group by c.name ; 
+
+--> this query will give the result of highest purchase amount for each customer
+
+it means that if customer buys 3,4 times among the highest amount, 
+to get the only highest of highest customer name, then we need to use order by also 
+
+Q4. Customer who purchase with highest amount? 
+
+* select c.name as name, max(p.amount) as high_amount from cus c join pur p on(c.userid=p.userid) group by c.name;
+
+--> this query will give the result of highest purchase amount for each customer because of group by 
+
+-->it means that if customer buys 3,4 times among the highest amount, 
+-->to get the only highest of highest customer name, then we need to use order by also 
+--> use order by also and limit 1 ;
+
+* select c.name as name, max(p.amount) as high_amount from cus c join pur p on(c.userid=p.userid) group by c.name order by high_amount desc limit 1;
+
+
+Q5. Count number of clicks on each page? 
+
+
+* select page, count(page) as num_clicks from click group by page order by num_clicks;
+
+Q6. name of customer and visited pages by customer?
+
+* select c.name as name, concat_ws(",",collect_set(ck.page)) as pages from cus c join click ck on (c.userid=ck.userid) group by c.name;
+
+
+Q7. Customer name, purchase amount and visit pages ?
+
+* select c.name as name, concat_ws(",",collect_set(ck.page)) as pages , sum(p.amount) as amount from cus c join click ck on (c.userid=ck.userid) join pur p on (c.userid=p.userid)
+group by c.name;
+
+error:  7th query: it will sum the amount of money , according to how many pages visit by the customer although total money spent by customer is only one time.
+
+solution: sub query approach
+
+* select c.name as name, pages, tamount from cus c join (select userid, concat_ws(",", collect_set(page)) as pages from click group by userid) ck on (c.userid=ck.userid) join (select userid, sum(amount) as tamount from pur group by userid) p on (c.userid=p.userid);
+
+--> this will give the total amount purchase by per customer by calculating
+
+similary as we required we can do more queries ... 
+Like 2nd higest amount purchase by customer and visited pages ..
