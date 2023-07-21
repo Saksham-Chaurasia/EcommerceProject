@@ -11,3 +11,6 @@ export SQOOP_HOME=/home/hadoop/sqoop
 export PATH=$PATH:$SQOOP_HOME/bin
 
 
+------------mysql java connector---------
+
+4. wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.27.tar.gz
